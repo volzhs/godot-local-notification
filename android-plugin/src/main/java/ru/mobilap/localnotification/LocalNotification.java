@@ -1,31 +1,24 @@
 package ru.mobilap.localnotification;
 
 import android.app.Activity;
-import android.app.PendingIntent;
 import android.app.AlarmManager;
-import android.os.Bundle;
+import android.app.PendingIntent;
 import android.content.Intent;
+import android.os.Bundle;
 import android.util.Log;
-import android.net.Uri;
 import android.view.View;
-import java.util.Map;
-import java.util.List;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Calendar;
-import org.json.JSONObject;
-import org.json.JSONArray;
-import org.json.JSONException;
 
-import org.godotengine.godot.Godot;
-import org.godotengine.godot.GodotLib;
 import org.godotengine.godot.Dictionary;
+import org.godotengine.godot.Godot;
 import org.godotengine.godot.plugin.GodotPlugin;
-import org.godotengine.godot.plugin.SignalInfo;
+
+import java.util.Arrays;
+import java.util.Calendar;
+import java.util.List;
 
 public class LocalNotification extends GodotPlugin {
 
-    private Godot activity = null;
+    private Godot godot = null;
     private Dictionary notificationData = new Dictionary();
     private String action = null;
     private String uri = null;
@@ -33,7 +26,7 @@ public class LocalNotification extends GodotPlugin {
     public LocalNotification(Godot godot) 
     {
         super(godot);
-        activity = godot;
+        this.godot = godot;
         checkIntent();
     }
 
@@ -91,7 +84,7 @@ public class LocalNotification extends GodotPlugin {
         calendar.setTimeInMillis(System.currentTimeMillis());
         calendar.add(Calendar.SECOND, interval);
                
-        AlarmManager am = (AlarmManager)activity.getSystemService(activity.ALARM_SERVICE);
+        AlarmManager am = (AlarmManager) godot.getActivity().getSystemService(godot.getActivity().ALARM_SERVICE);
         if(android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.KITKAT) {
             am.setExact(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), sender);
         } else {
@@ -109,11 +102,11 @@ public class LocalNotification extends GodotPlugin {
     // Internal methods
 
     private PendingIntent getPendingIntent(String message, String title, int tag) {
-        Intent i = new Intent(activity.getApplicationContext(), LocalNotificationReceiver.class);
+        Intent i = new Intent(godot.getActivity().getApplicationContext(), LocalNotificationReceiver.class);
         i.putExtra("notification_id", tag);
         i.putExtra("message", message);
         i.putExtra("title", title);
-        PendingIntent sender = PendingIntent.getBroadcast(activity, tag, i, PendingIntent.FLAG_UPDATE_CURRENT);
+        PendingIntent sender = PendingIntent.getBroadcast(godot.getActivity(), tag, i, PendingIntent.FLAG_UPDATE_CURRENT);
         return sender;
     }
 
