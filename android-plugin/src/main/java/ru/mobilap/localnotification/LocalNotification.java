@@ -2,6 +2,7 @@ package ru.mobilap.localnotification;
 
 import android.app.Activity;
 import android.app.AlarmManager;
+import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Intent;
 import android.os.Bundle;
@@ -46,7 +47,10 @@ public class LocalNotification extends GodotPlugin {
                 "get_device_token",
                 "get_notification_data",
                 "get_deeplink_action",
-                "get_deeplink_uri"
+                "get_deeplink_uri",
+                "cancelAll",
+                "cancel",
+                "cancelAlarm"
         );
     }
 
@@ -92,6 +96,22 @@ public class LocalNotification extends GodotPlugin {
         }
     }
 
+    public void cancelAll(){
+        NotificationManager manager = (NotificationManager)godot.getActivity().getSystemService(godot.getContext().NOTIFICATION_SERVICE);
+        manager.cancelAll();
+    }
+
+    public void cancel(int id){
+        NotificationManager manager = (NotificationManager)godot.getActivity().getSystemService(godot.getContext().NOTIFICATION_SERVICE);
+        manager.cancel(id);
+    }
+
+    public void cancelAlarm(int tag) {
+        PendingIntent sender = getPendingIntent("","", tag);
+        AlarmManager am = (AlarmManager) godot.getActivity().getSystemService(godot.getActivity().ALARM_SERVICE);
+        am.cancel(sender);
+    }
+
     public void register_remote_notification() {
     }
 
@@ -102,7 +122,7 @@ public class LocalNotification extends GodotPlugin {
     // Internal methods
 
     private PendingIntent getPendingIntent(String message, String title, int tag) {
-        Intent i = new Intent(godot.getActivity().getApplicationContext(), LocalNotificationReceiver.class);
+        Intent i = new Intent(godot.getContext(), LocalNotificationReceiver.class);
         i.putExtra("notification_id", tag);
         i.putExtra("message", message);
         i.putExtra("title", title);
